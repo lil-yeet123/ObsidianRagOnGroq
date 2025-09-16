@@ -7,16 +7,21 @@ load_dotenv()
 
 class GroqQA:
     def __init__(self, vectorstore, model="openai/gpt-oss-20b"):
-
         self.retriever = vectorstore.as_retriever()
         self.client = Groq(api_key=os.environ["GROQ_API_KEY"])
         self.model = model
+        self.chat_history = []
+
+    def reset(self):
+        self.chat_history = []
 
     def ask(self, question: str, stream=True, **kwargs):
+        # Relevante Dokumente abrufen
         docs = self.retriever.get_relevant_documents(question)
         context = "\n\n".join([d.page_content for d in docs])
 
         prompt = f"📂 Kontext:\n{context}\n\n❓ Frage:\n{question}"
+
 
         messages = [
             {
@@ -29,10 +34,11 @@ Regeln:
 - Sprache = Sprache der Frage
 - Quellen angeben, falls möglich
 - Allgemeinwissen nur kennzeichnen
-- Keine Markdown-Ausgabe, außer explizit verlangt"""
-            },
-            {"role": "user", "content": prompt}
-        ]
+- Keine Markdown-Ausgabe, außer explizit verlangt
+- Du wirst zu 99% im Terminal benutzt, also mach alle Ausgaben gut lesbar
+"""
+            }
+        ] + self.chat_history + [{"role": "user", "content": prompt}]
 
         completion = self.client.chat.completions.create(
             model=self.model,
@@ -40,7 +46,6 @@ Regeln:
             stream=stream,
             **kwargs
         )
-
 
         text = ""
         for chunk in completion:
@@ -50,10 +55,10 @@ Regeln:
                 text += delta.content
         print()
 
+        self.chat_history.append({"role": "user", "content": prompt})
+        self.chat_history.append({"role": "assistant", "content": text})
 
-        result = {
+        return {
             "answer": text,
             "source_documents": docs
         }
-
-        return result

@@ -4,3 +4,8 @@ langchain-text-splitters
 chromadb
 sentence-transformers
 unstructured[md]
+groq
+python-dotenv
+fastapi
+uvicorn
+jinja2

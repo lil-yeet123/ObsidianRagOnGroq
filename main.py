@@ -6,14 +6,12 @@ from qa import GroqQA
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-
 load_dotenv()
 
 VAULT_PATH = "/home/matti/Obsidian"
 DB_PATH = "db/faiss_index"
 
 def init_db():
-
     documents = load_documents(VAULT_PATH)
     documents = [doc for doc in documents if "Templates/" not in doc.metadata.get("source", "")]
     print(f"[+] Geladene Dokumente (nach Filter): {len(documents)}")
@@ -39,12 +37,11 @@ def chat():
         result = qa.ask(query)
         print("\n")
 
-        if hasattr(result, "source_documents") and result.source_documents:
+        if result.get("source_documents"):
             print("\n📂 Quellen:")
-            for doc in result.source_documents:
+            for doc in result["source_documents"]:
                 print("-", doc.metadata.get("source"))
         print("\n")
-
 
 if __name__ == "__main__":
     chat()
