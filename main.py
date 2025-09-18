@@ -4,12 +4,18 @@ from loader import load_documents
 from vectorstore import build_vectorstore, load_vectorstore
 from qa import GroqQA
 
+from rich.console import Console
+from rich.markdown import Markdown
+
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+console = Console()
 
 load_dotenv()
 
 VAULT_PATH = "/home/matti/Obsidian"
 DB_PATH = "db/faiss_index"
+
 
 def init_db():
     documents = load_documents(VAULT_PATH)
@@ -27,21 +33,24 @@ def chat():
     db = init_db()
     qa = GroqQA(db)
 
-    print("Obsidian-RAG-Bot mit Groq (quit mit 'exit')\n")
+    console.print("Obsidian-RAG-Bot mit Groq (quit mit 'exit')\n", style="bold green")
     while True:
         query = input("Frage: ")
         if query.lower().strip() in ["exit", "quit"]:
             break
 
-        print("\n", end=" ", flush=True)
         result = qa.ask(query)
-        print("\n")
+        answer_md = result.get("answer", "")
+
+
+        console.print(Markdown(answer_md))
+
 
         if result.get("source_documents"):
-            print("\n📂 Quellen:")
+            console.print("\n📂 Quellen:", style="bold yellow")
             for doc in result["source_documents"]:
-                print("-", doc.metadata.get("source"))
-        print("\n")
+                console.print(f"- {doc.metadata.get('source')}")
+        console.print("\n")
 
 if __name__ == "__main__":
     chat()

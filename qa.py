@@ -22,11 +22,10 @@ class GroqQA:
 
         prompt = f"📂 Kontext:\n{context}\n\n❓ Frage:\n{question}"
 
-
         messages = [
-            {
-                "role": "system",
-                "content": """Du bist ein persönlicher Assistent mit Zugriff auf ein Obsidian-Vault.
+                       {
+                           "role": "system",
+                           "content": """Du bist ein persönlicher Assistent mit Zugriff auf ein Obsidian-Vault.
 Regeln:
 - Nutze ausschließlich die Kontextinformationen aus dem Vault
 - Falls unzureichend: sag es offen
@@ -34,11 +33,11 @@ Regeln:
 - Sprache = Sprache der Frage
 - Quellen angeben, falls möglich
 - Allgemeinwissen nur kennzeichnen
-- Keine Markdown-Ausgabe, außer explizit verlangt
+- Gib mir alles schön als Markdown formatiert zurück
 - Du wirst zu 99% im Terminal benutzt, also mach alle Ausgaben gut lesbar
 """
-            }
-        ] + self.chat_history + [{"role": "user", "content": prompt}]
+                       }
+                   ] + self.chat_history + [{"role": "user", "content": prompt}]
 
         completion = self.client.chat.completions.create(
             model=self.model,
@@ -51,9 +50,9 @@ Regeln:
         for chunk in completion:
             delta = chunk.choices[0].delta
             if hasattr(delta, "content") and delta.content:
-                print(delta.content, end="", flush=True)
+                # print(delta.content, end="", flush=True)
                 text += delta.content
-        print()
+        # print()
 
         self.chat_history.append({"role": "user", "content": prompt})
         self.chat_history.append({"role": "assistant", "content": text})
