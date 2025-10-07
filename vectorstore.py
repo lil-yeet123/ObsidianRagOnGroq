@@ -20,7 +20,6 @@ def build_vectorstore(documents, persist_directory=DB_PATH):
 
     db = FAISS.from_documents(docs, embeddings)
 
-
     os.makedirs(persist_directory, exist_ok=True)
     with open(os.path.join(persist_directory, "faiss_index.pkl"), "wb") as f:
         pickle.dump(db, f)

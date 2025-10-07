@@ -17,7 +17,6 @@ DB_PATH = "db/faiss_index"
 app = Flask(__name__)
 CORS(app)
 
-# Einmalige Initialisierung beim Start
 def init_db():
     documents = load_documents(VAULT_PATH)
     documents = [doc for doc in documents if "Templates/" not in doc.metadata.get("source", "")]
